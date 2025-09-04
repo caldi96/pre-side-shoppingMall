@@ -10,9 +10,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/user")
+@RequestMapping("/api/auth")
 public class UserController {
 
     private final UserService userService;
@@ -24,8 +26,8 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody UserLoginRequest request) {
-        userService.login(request);
-        return "로그인 성공";
+    public ResponseEntity<?> login(@RequestBody UserLoginRequest request) {
+        String token = userService.login(request);
+        return ResponseEntity.ok().body(Map.of("token", token));
     }
 }

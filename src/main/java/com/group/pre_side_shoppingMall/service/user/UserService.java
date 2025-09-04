@@ -1,5 +1,6 @@
 package com.group.pre_side_shoppingMall.service.user;
 
+import com.group.pre_side_shoppingMall.config.jwt.JwtUtil;
 import com.group.pre_side_shoppingMall.domain.user.User;
 import com.group.pre_side_shoppingMall.domain.user.UserRepository;
 import com.group.pre_side_shoppingMall.dto.user.request.UserLoginRequest;
@@ -14,6 +15,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;  // BCrypt
+    private final JwtUtil jwtUtil;
 
     // 회원가입
     public void signUp(UserSignUpRequest request) {
@@ -36,8 +38,8 @@ public class UserService {
         userRepository.save(user);
     }
 
-    // 로그인
-    public void login(UserLoginRequest request) {
+    // 로그인 시 JWT 토큰 반환
+    public String login(UserLoginRequest request) {
         User user = userRepository.findByUserName(request.getUserName())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다"));
 
@@ -45,9 +47,9 @@ public class UserService {
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다");
         }
-    }
 
-    // 로그인 성공 시 필요한 로직 작성 가능
-    // 예: 세션 저장, JWT 발급 등
+        // 로그인 성공 -> 토큰 발급
+        return jwtUtil.createToken(user.getUserName());
+    }
 
 }
