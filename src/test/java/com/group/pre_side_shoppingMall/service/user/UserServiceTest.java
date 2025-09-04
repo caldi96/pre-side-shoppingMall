@@ -54,7 +54,7 @@ public class UserServiceTest {
     }
 
     @Test
-    @DisplayName("회원가입 실 - 이미 존재하는 회원")
+    @DisplayName("회원가입 실패 - 이미 존재하는 회원")
     void signUp_fail_duplicateUser() {
         // given
         User existingUser = new User("testUser", "encodedPw", "홍길동", 20);
