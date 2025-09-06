@@ -27,6 +27,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable) // CSRF 비활성화 (스프링부트 3.x부터)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/signUp", "/api/auth/login").permitAll() // 회원가입, 로그인 허용
+                        .requestMatchers("/product/**").permitAll() // 나중에 지워야함
                         .anyRequest().authenticated() // 나머지는 인증 필요
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

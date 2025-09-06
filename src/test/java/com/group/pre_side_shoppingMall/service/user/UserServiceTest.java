@@ -1,25 +1,25 @@
 package com.group.pre_side_shoppingMall.service.user;
 
+import com.group.pre_side_shoppingMall.config.jwt.JwtUtil;
 import com.group.pre_side_shoppingMall.domain.user.User;
 import com.group.pre_side_shoppingMall.domain.user.UserRepository;
 import com.group.pre_side_shoppingMall.dto.user.request.UserLoginRequest;
 import com.group.pre_side_shoppingMall.dto.user.request.UserSignUpRequest;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
-
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
 
 public class UserServiceTest {
 
@@ -28,6 +28,9 @@ public class UserServiceTest {
 
     @Mock
     private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private JwtUtil jwtUtil;
 
     @InjectMocks
     private UserService userService;
@@ -76,9 +79,14 @@ public class UserServiceTest {
 
         given(userRepository.findByUserName("testUser")).willReturn(Optional.of(user));
         given(passwordEncoder.matches("password123", "encodedPw")).willReturn(true);
+        given(jwtUtil.createToken(user.getUserName())).willReturn("mocked-jwt-token"); // jwt 반환값 모킹
 
-        // when & then (예외 발생 안 하면 성공)
-        userService.login(request);
+        // when
+        String token = userService.login(request);
+
+        // then
+        assertNotNull(token); // token이 정상적으로 반환되는지 확인
+        verify(jwtUtil, times(1)).createToken(user.getUserName());
     }
 
     @Test
@@ -95,4 +103,15 @@ public class UserServiceTest {
         assertThrows(IllegalArgumentException.class, () -> userService.login(request));
     }
 
+    @Test
+    @DisplayName("로그인 실패 - 존재하지 않는 회원")
+    void login_fail_notExistingUser() {
+        UserLoginRequest request = new UserLoginRequest("unknownUser", "1234");
+
+        given(userRepository.findByUserName("unknownUser")).willReturn(Optional.empty());
+
+        assertThrows(IllegalArgumentException.class, () -> userService.login(request));
+
+        verify(jwtUtil, never()).createToken(any());
+    }
 }
