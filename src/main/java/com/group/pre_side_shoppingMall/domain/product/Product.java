@@ -13,7 +13,7 @@ public class Product {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productId = null;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String productName;
 
     @Column(nullable = false)
@@ -23,4 +23,31 @@ public class Product {
 
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> orderItems = new ArrayList<>();
+
+    protected Product() {}
+
+    public Product(String productName, int productPrice, int productStock) {
+        if (productName == null || productName.isBlank()) {
+            throw new IllegalArgumentException("제품명이 비었습니다");
+        }
+        this.productName = productName;
+        this.productPrice = productPrice;
+        this.productStock = productStock;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public String getProductName() {
+        return productName;
+    }
+
+    public int getProductPrice() {
+        return productPrice;
+    }
+
+    public int getProductStock() {
+        return productStock;
+    }
 }

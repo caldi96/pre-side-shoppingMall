@@ -1,6 +1,7 @@
 package com.group.pre_side_shoppingMall.domain.user;
 
 import com.group.pre_side_shoppingMall.domain.order.Order;
+import com.group.pre_side_shoppingMall.domain.user.enums.UserRole;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
@@ -24,6 +25,9 @@ public class User {
 
     private int age;
 
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Order> orders = new ArrayList<>();
 
@@ -34,6 +38,7 @@ public class User {
         this.password = password;
         this.name = name;
         this.age = age;
+        this.role = UserRole.USER;
     }
 
     public String getUserName() {
