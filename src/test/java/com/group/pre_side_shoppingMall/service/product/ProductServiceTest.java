@@ -71,7 +71,7 @@ public class ProductServiceTest {
     }
 
     @Test
-    @DisplayName("상품정보 가져오기(다건) 리스트")
+    @DisplayName("상품정보 전체 리스트 가져오기")
     void getProducts_success() {
         Product product1 = new Product("상품1", 1000, 5);
         Product product2 = new Product("상품2", 2000, 3);
