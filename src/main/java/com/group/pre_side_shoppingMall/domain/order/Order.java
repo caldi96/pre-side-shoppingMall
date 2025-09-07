@@ -17,6 +17,7 @@ public class Order {
     private Long orderId = null;
 
     @ManyToOne
+    @JoinColumn(name = "user_id") // DB 컬럼 이름과 정확히 맞춤
     private User user;
 
     private int totalPrice;

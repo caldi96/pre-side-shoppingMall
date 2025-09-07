@@ -6,6 +6,7 @@ import com.group.pre_side_shoppingMall.domain.order.payment.enums.PaymentWay;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "payment")
 public class Payment {
 
     @Id
@@ -21,5 +22,6 @@ public class Payment {
     private PaymentStatus paymentStatus;
 
     @OneToOne
+    @JoinColumn(name = "order_id") // DB 컬럼과 매핑
     private Order order;
 }

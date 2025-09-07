@@ -1,12 +1,15 @@
 package com.group.pre_side_shoppingMall.domain.product;
 
 import com.group.pre_side_shoppingMall.domain.order.orderItem.OrderItem;
+import com.group.pre_side_shoppingMall.dto.product.request.ProductPriceUpdateRequest;
+import com.group.pre_side_shoppingMall.dto.product.request.ProductStockUpdateRequest;
 import jakarta.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Table(name = "product")
 public class Product {
 
     @Id
@@ -49,5 +52,13 @@ public class Product {
 
     public int getProductStock() {
         return productStock;
+    }
+
+    public void updateProductPrice(int productPrice) {
+        this.productPrice = productPrice;
+    }
+
+    public void updateProductStock(int productStock) {
+        this.productStock = productStock;
     }
 }

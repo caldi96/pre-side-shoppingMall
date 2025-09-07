@@ -6,6 +6,7 @@ import com.group.pre_side_shoppingMall.domain.order.orderItem.OrderItem;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "delivery")
 public class Delivery {
 
     @Id
@@ -23,5 +24,6 @@ public class Delivery {
     private ParcelCorp parcelCorp;
 
     @OneToOne
+    @JoinColumn(name = "order_item_id") // DB 컬럼과 매핑
     private OrderItem orderItem;
 }
