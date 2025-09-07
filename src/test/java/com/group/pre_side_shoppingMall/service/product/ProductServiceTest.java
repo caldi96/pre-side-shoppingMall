@@ -4,6 +4,8 @@ import com.group.pre_side_shoppingMall.domain.product.Product;
 import com.group.pre_side_shoppingMall.domain.product.ProductRepository;
 import com.group.pre_side_shoppingMall.dto.product.request.ProductCreateRequest;
 import com.group.pre_side_shoppingMall.dto.product.request.ProductGetRequest;
+import com.group.pre_side_shoppingMall.dto.product.request.ProductPriceUpdateRequest;
+import com.group.pre_side_shoppingMall.dto.product.request.ProductStockUpdateRequest;
 import com.group.pre_side_shoppingMall.dto.product.response.ProductResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -11,6 +13,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.security.core.parameters.P;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -117,5 +121,101 @@ public class ProductServiceTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("해당 상품이 존재하지 않습니다");
 
+    }
+
+    @Test
+    @DisplayName("상품 가격 수정 - 성공")
+    void updateProductPrice_success() {
+        // given
+        ProductPriceUpdateRequest request = new ProductPriceUpdateRequest(1L, 180000);
+        Product product = new Product("냉장고", 2000000, 3);
+
+        given(productRepository.findById(1L)).willReturn(Optional.of(product));
+
+        // when
+        ProductResponse response = productService.updateProductPrice(request);
+
+        // then
+        assertThat(response).isNotNull();
+        assertThat(response.getProductPrice()).isEqualTo(180000);
+        verify(productRepository, never()).save(any(Product.class));
+    }
+
+    @Test
+    @DisplayName("상품 가격 수정 실패 - 상품 존재하지 않음")
+    void updateProductPrice_fail_notFound() {
+        // given
+        ProductPriceUpdateRequest request = new ProductPriceUpdateRequest(99L, 180000);
+        given(productRepository.findById(99L)).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> productService.updateProductPrice(request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("해당 상품이 존재하지 않습니다");
+
+    }
+
+    @Test
+    @DisplayName("상품 수량 수정 - 성공")
+    void updateProductStock_success() {
+        // given
+        ProductStockUpdateRequest request = new ProductStockUpdateRequest(1L, 4);
+        Product product = new Product("냉장고", 2000000, 3);
+
+        given(productRepository.findById(1L)).willReturn(Optional.of(product));
+
+        // when
+        ProductResponse response = productService.updateProductStock(request);
+
+        // then
+        assertThat(response).isNotNull();
+        assertThat(response.getProductStock()).isEqualTo(4);
+        verify(productRepository, never()).save(any(Product.class));
+    }
+
+    @Test
+    @DisplayName("상품 수량 수정 실패 - 상품 존재하지 않음")
+    void updateProductStock_fail_notFound() {
+        // given
+        ProductStockUpdateRequest request = new ProductStockUpdateRequest(99L, 3);
+        given(productRepository.findById(99L)).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> productService.updateProductStock(request))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("해당 상품이 존재하지 않습니다");
+
+    }
+
+    @Test
+    @DisplayName("상품 삭제 성공")
+    void deleteProduct_success() {
+        // given
+        Product product = new Product("냉장고", 2000000, 3);
+        ReflectionTestUtils.setField(product, "productId", 1L);
+
+        given(productRepository.findById(1L)).willReturn(Optional.of(product));
+
+        // when
+        productService.deleteProduct(1L);
+
+        // then
+        verify(productRepository, times(1)).deleteById(1L);
+    }
+
+    @Test
+    @DisplayName("상품 삭제 실패 - 상품 존재하지 않음")
+    void deleteProduct_fail_notFound() {
+        // given
+        Long productId = 99L;
+        given(productRepository.findById(productId)).willReturn(Optional.empty());
+
+        // when & then
+        assertThatThrownBy(() -> productService.deleteProduct(productId))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("해당 상품이 존재하지 않습니다");
+
+        // Optional: deleteById 호출 안 되는지 확인
+        verify(productRepository, never()).deleteById(productId);
     }
 }

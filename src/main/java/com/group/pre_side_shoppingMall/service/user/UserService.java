@@ -8,6 +8,7 @@ import com.group.pre_side_shoppingMall.dto.user.request.UserSignUpRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +19,7 @@ public class UserService {
     private final JwtUtil jwtUtil;
 
     // 회원가입
+    @Transactional
     public void signUp(UserSignUpRequest request) {
         // 아이디 중복 체크
         userRepository.findByUserName(request.getUserName())
@@ -39,6 +41,7 @@ public class UserService {
     }
 
     // 로그인 시 JWT 토큰 반환
+    @Transactional
     public String login(UserLoginRequest request) {
         User user = userRepository.findByUserName(request.getUserName())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다"));
