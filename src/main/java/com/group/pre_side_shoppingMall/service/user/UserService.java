@@ -41,7 +41,7 @@ public class UserService {
     }
 
     // 로그인 시 JWT 토큰 반환
-    @Transactional
+    @Transactional(readOnly = true)
     public String login(UserLoginRequest request) {
         User user = userRepository.findByUserName(request.getUserName())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다"));

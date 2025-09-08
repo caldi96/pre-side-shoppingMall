@@ -2,6 +2,7 @@ package com.group.pre_side_shoppingMall.config.jwt;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -23,9 +24,11 @@ public class JwtUtil {
 
     @PostConstruct
     public void init() {
-        // Base64로 인코딩 후 HMAC 키 생성
-        String encodedSecretKey = Base64.getEncoder().encodeToString(secretKey.getBytes());
-        key = Keys.hmacShaKeyFor(encodedSecretKey.getBytes());
+        // secretKey 길이 검증 (HMAC-SHA256은 최소 32바이트 필요)
+        if (secretKey.length() < 32) {
+            throw new IllegalArgumentException("secret 키는 적어도 32자 이상이어야 합니다");
+        }
+        key = Keys.hmacShaKeyFor(secretKey.getBytes());
     }
 
     public String createToken(String userName) {
@@ -53,7 +56,14 @@ public class JwtUtil {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
-        } catch (JwtException | IllegalArgumentException e) {
+        } catch (ExpiredJwtException e) {
+            // 토큰 만료
+            return false;
+        } catch (UnsupportedJwtException | MalformedJwtException | SignatureException e) {
+            // 잘못된 토큰
+            return false;
+        } catch (IllegalArgumentException e) {
+            // 토큰이 null 이거나 빈 문자열
             return false;
         }
     }

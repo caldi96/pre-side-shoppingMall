@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -25,6 +26,8 @@ public class SecurityConfig {
         http
                 //.csrf(csrf -> csrf.disable()) 스프링부트 2.x CSRF 비활성화
                 .csrf(AbstractHttpConfigurer::disable) // CSRF 비활성화 (스프링부트 3.x부터)
+                .sessionManagement(session ->
+                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // JWT 사용시 세션을 무상태로 관리
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/signUp", "/api/auth/login").permitAll() // 회원가입, 로그인 허용
                         .requestMatchers("/product/**").permitAll() // 나중에 지워야함
