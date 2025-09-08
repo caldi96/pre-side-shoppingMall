@@ -41,7 +41,7 @@ public class ProductService {
     }
 
     // 상품 전체 리스트 가져오기(다건)
-    @Transactional
+    @Transactional(readOnly = true) // 읽기 전용
     public List<ProductResponse> getProducts() {
 
         List<Product> products = productRepository.findAll();
@@ -52,7 +52,7 @@ public class ProductService {
     }
 
     // 상품정보 가져오기(단건)
-    @Transactional
+    @Transactional(readOnly = true) // 읽기 전용
     public ProductResponse getProduct(ProductGetRequest request) {
 
         Product product = productRepository.findById(request.getProductId())
