@@ -4,6 +4,7 @@ import com.group.pre_side_shoppingMall.domain.order.orderItem.OrderItem;
 import com.group.pre_side_shoppingMall.domain.order.payment.Payment;
 import com.group.pre_side_shoppingMall.domain.user.User;
 import jakarta.persistence.*;
+import org.aspectj.weaver.ast.Or;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,4 +28,26 @@ public class Order {
 
     @OneToOne(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private Payment payment;
+
+    protected Order() {}
+
+    public Long getOrderId() {
+        return orderId;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public int getTotalPrice() {
+        return totalPrice;
+    }
+
+    public List<OrderItem> getOrderItems() {
+        return orderItems;
+    }
+
+    public Payment getPayment() {
+        return payment;
+    }
 }
