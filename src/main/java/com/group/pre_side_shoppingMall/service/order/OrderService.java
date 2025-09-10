@@ -8,6 +8,7 @@ import com.group.pre_side_shoppingMall.domain.user.UserRepository;
 import com.group.pre_side_shoppingMall.dto.order.orderItem.request.OrderItemRequest;
 import com.group.pre_side_shoppingMall.dto.order.request.OrderCreateRequest;
 import com.group.pre_side_shoppingMall.dto.order.response.OrderResponse;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,11 +31,11 @@ public class OrderService {
     public OrderResponse createOrder(OrderCreateRequest request) {
         OrderResponse response = new OrderResponse();
 
-        // 유저 확인
+        // 1.유저 확인
         User user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다"));
 
-        // 상품 존재 유무 확인
+        // 2.상품 존재 유무 확인
 
         // 요청에서 넘어온 상품 ID
         Set<Long> productIds = request.getOrderItems().stream()
@@ -46,7 +47,7 @@ public class OrderService {
 
         // 요청한 상품 개수와 DB에서 조회된 개수가 다르면 → 존재하지 않는 상품 있음
         if (products.size() != productIds.size()) {
-            new IllegalArgumentException("존재하지 않는 상품이 포함되어 있습니다");
+            throw new IllegalArgumentException("존재하지 않는 상품이 포함되어 있습니다");
         }
 
         /*
@@ -59,7 +60,7 @@ public class OrderService {
         }
          */
 
-        // 재고 확인 - 요청한 상품들의 수량보다 남아있는 재고가 같거나 큰지 확인
+        // 3.재고 확인 - 요청한 상품들의 수량보다 남아있는 재고가 같거나 큰지 확인
 
         // 요청에서 넘어온 상품 수량
         Map<Long, Integer> requestedQuantitiesMap = request.getOrderItems().stream()
@@ -78,6 +79,7 @@ public class OrderService {
          */
 
         // stream으로 재고 확인
+        // 하나의 상품이라도 재고가 부족하면 예외 던짐
         boolean insufficientStock = products.stream()
                 .anyMatch(product -> product.getProductStock() <
                         requestedQuantitiesMap.get(product.getProductId()));
@@ -85,6 +87,20 @@ public class OrderService {
         if (insufficientStock) {
             throw new IllegalArgumentException("재고가 부족한 상품이 있습니다");
         }
+
+        // 4.전체 가격 계산
+        /*
+        // 1) for문으로 계산
+        int totalPrice = 0;
+        for (Product product : products) {
+            int quantity = requestedQuantitiesMap.get(product.getProductId());
+            totalPrice += product.getProductPrice() * quantity;
+        }
+         */
+        // 2) stream으로 계산
+        int toalPrice = products.stream()
+                .mapToInt(product -> product.getProductPrice() * requestedQuantitiesMap.get(product.getProductId()))
+                .sum();
 
         return response;
     }
