@@ -2,8 +2,10 @@ package com.group.pre_side_shoppingMall.domain.order;
 
 import com.group.pre_side_shoppingMall.domain.order.orderItem.OrderItem;
 import com.group.pre_side_shoppingMall.domain.order.payment.Payment;
+import com.group.pre_side_shoppingMall.domain.product.Product;
 import com.group.pre_side_shoppingMall.domain.user.User;
 import jakarta.persistence.*;
+import lombok.Setter;
 import org.aspectj.weaver.ast.Or;
 
 import java.util.ArrayList;
@@ -31,6 +33,11 @@ public class Order {
 
     protected Order() {}
 
+    public Order(User user, int totalPrice) {
+        this.user = user;
+        this.totalPrice = totalPrice;
+    }
+
     public Long getOrderId() {
         return orderId;
     }
@@ -49,5 +56,16 @@ public class Order {
 
     public Payment getPayment() {
         return payment;
+    }
+
+    public void createOrderItem(int quantity, int orderPrice, Product product) {
+        orderItems.add(new OrderItem(quantity, orderPrice, product, this));
+    }
+
+    public void setPayment(Payment payment) {
+        this.payment = payment;
+        // Payment 에 orderId 추가
+        // 이렇게 order와 payment 간 양방향 매핑을 한다
+        payment.setOrder(this);
     }
 }

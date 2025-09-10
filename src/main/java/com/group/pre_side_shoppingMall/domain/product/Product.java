@@ -61,4 +61,13 @@ public class Product {
     public void updateProductStock(int productStock) {
         this.productStock = productStock;
     }
+
+    public void minusProductStock(int quantity) {
+        if (this.productStock < quantity) {
+            throw new IllegalArgumentException(
+                    String.format("상품 %s의 재고가 부족합니다. 현재 재고:%d, 요청 수량:%d",
+                            this.productName, this.productStock, quantity));
+        }
+        this.productStock -= quantity;
+    }
 }
