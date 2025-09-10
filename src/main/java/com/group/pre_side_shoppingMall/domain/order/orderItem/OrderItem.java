@@ -27,4 +27,13 @@ public class OrderItem {
 
     @OneToOne(mappedBy = "orderItem", cascade = CascadeType.ALL, orphanRemoval = true)
     private Delivery delivery;
+
+    protected OrderItem() {}
+
+    public OrderItem(int quantity, int orderPrice, Product product, Order order) {
+        this.quantity = quantity;
+        this.orderPrice = orderPrice;
+        this.product = product;
+        this.order = order;
+    }
 }

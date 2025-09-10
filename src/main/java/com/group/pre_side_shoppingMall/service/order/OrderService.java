@@ -1,6 +1,8 @@
 package com.group.pre_side_shoppingMall.service.order;
 
+import com.group.pre_side_shoppingMall.domain.order.Order;
 import com.group.pre_side_shoppingMall.domain.order.OrderRepository;
+import com.group.pre_side_shoppingMall.domain.order.payment.Payment;
 import com.group.pre_side_shoppingMall.domain.product.Product;
 import com.group.pre_side_shoppingMall.domain.product.ProductRepository;
 import com.group.pre_side_shoppingMall.domain.user.User;
@@ -29,7 +31,6 @@ public class OrderService {
     // 주문 생성
     @Transactional
     public OrderResponse createOrder(OrderCreateRequest request) {
-        OrderResponse response = new OrderResponse();
 
         // 1.유저 확인
         User user = userRepository.findById(request.getUserId())
@@ -47,7 +48,11 @@ public class OrderService {
 
         // 요청한 상품 개수와 DB에서 조회된 개수가 다르면 → 존재하지 않는 상품 있음
         if (products.size() != productIds.size()) {
-            throw new IllegalArgumentException("존재하지 않는 상품이 포함되어 있습니다");
+            Set<Long> foundsId = products.stream()
+                    .map(Product::getProductId)
+                    .collect(Collectors.toSet());
+            productIds.removeAll(foundsId);
+            throw new IllegalArgumentException("존재하지 않는 상품 ID: " + productIds);
         }
 
         /*
@@ -80,6 +85,8 @@ public class OrderService {
 
         // stream으로 재고 확인
         // 하나의 상품이라도 재고가 부족하면 예외 던짐
+        /*
+        // 방식1
         boolean insufficientStock = products.stream()
                 .anyMatch(product -> product.getProductStock() <
                         requestedQuantitiesMap.get(product.getProductId()));
@@ -87,6 +94,19 @@ public class OrderService {
         if (insufficientStock) {
             throw new IllegalArgumentException("재고가 부족한 상품이 있습니다");
         }
+         */
+        // 방식2
+        products.stream()
+                .filter(product -> product.getProductStock() < requestedQuantitiesMap.get(product.getProductId()))
+                .findFirst()
+                .ifPresent(product -> {
+                    throw new IllegalArgumentException(
+                            String.format("상품 %s의 재고가 부족합니다. 요청: %d, 재고: %d",
+                                    product.getProductName(),
+                                    requestedQuantitiesMap.get(product.getProductId()),
+                                    product.getProductStock())
+                    );
+                });
 
         // 4.전체 가격 계산
         /*
@@ -98,10 +118,57 @@ public class OrderService {
         }
          */
         // 2) stream으로 계산
-        int toalPrice = products.stream()
+        int totalPrice = products.stream()
                 .mapToInt(product -> product.getProductPrice() * requestedQuantitiesMap.get(product.getProductId()))
                 .sum();
 
-        return response;
+        // 5.재고 차감
+        // 1) for문으로 처리
+        /*
+        for (Product product : products) {
+            product.minusProductStock(requestedQuantitiesMap.get(product.getProductId()));
+        }
+         */
+        // 2) forEach로 처리
+        products.stream()
+                .forEach(product ->
+                        product.minusProductStock(requestedQuantitiesMap.get(product.getProductId()))
+                );
+
+        // 6.주문 생성
+        Order order = new Order(user, totalPrice);
+
+        // 7. 주문 아이템 생성
+        // 1) for문으로 계산
+        for (Product product : products) {
+            int quantity = requestedQuantitiesMap.get(product.getProductId());
+            int orderPrice = product.getProductPrice() * quantity;
+            order.createOrderItem(quantity, orderPrice, product);
+        }
+        // 2) stream으로 계산
+        /*
+        products.stream()
+                .forEach(product -> {
+                    int quantity = requestedQuantitiesMap.get(product.getProductId());
+                    int orderPrice = product.getProductPrice() * quantity;
+                    order.createOrderItem(quantity, orderPrice, product);
+                });
+         */
+
+        // 8. 결제
+        Payment payment = new Payment(
+                request.getPayment().getPaymentWay(),
+                totalPrice
+        );
+        order.setPayment(payment);
+
+        // 9. 저장 -> 주문 생성
+        Order savedOrder = orderRepository.save(order);
+
+        // 외부 결제 api 호출 성공 시 상태변경
+        // 여기서는 우선 외부 결제 api 호출이 성공했다고 가정
+        payment.completePaymentStatus();
+
+        return new OrderResponse(savedOrder);
     }
 }
