@@ -19,4 +19,6 @@ public class ProductCreateRequest {
 
     @PositiveOrZero(message = "상품 재고는 0개 이상이어야 합니다")
     private int productStock;
+
+    private int totalPrice;
 }
