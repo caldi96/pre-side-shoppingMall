@@ -35,6 +35,26 @@ public class Payment {
         this.paymentStatus = PaymentStatus.READY;
     }
 
+    public Long getPaymentId() {
+        return paymentId;
+    }
+
+    public PaymentWay getPaymentWay() {
+        return paymentWay;
+    }
+
+    public int getPaymentPrice() {
+        return paymentPrice;
+    }
+
+    public PaymentStatus getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public Order getOrder() {
+        return order;
+    }
+
     public void completePaymentStatus() {
         this.paymentStatus = PaymentStatus.COMPLETED;
     }

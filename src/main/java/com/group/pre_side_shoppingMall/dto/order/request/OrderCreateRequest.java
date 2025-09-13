@@ -17,6 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 public class OrderCreateRequest {
 
+    @NotNull(message = "사용자 ID는 필수입니다")
     @Min(value = 1, message = "사용자 ID는 1 이상이어야 합니다")
     private Long userId; // 주문자
 

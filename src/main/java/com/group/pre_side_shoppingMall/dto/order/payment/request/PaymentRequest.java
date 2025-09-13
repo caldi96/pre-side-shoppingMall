@@ -21,4 +21,9 @@ public class PaymentRequest {
 
     //@NotNull(message = "결제 상태값은 필수 입니다")
     //private PaymentStatus paymentStatus;
+
+
+    public PaymentRequest(PaymentWay paymentWay) {
+        this.paymentWay = paymentWay;
+    }
 }

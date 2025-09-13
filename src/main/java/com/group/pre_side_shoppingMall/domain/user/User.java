@@ -42,11 +42,19 @@ public class User {
         this.role = UserRole.USER;
     }
 
+    public Long getUserId() {
+        return userId;
+    }
+
     public String getUserName() {
         return userName;
     }
 
     public String getPassword() {
         return password;
+    }
+
+    public String getName() {
+        return name;
     }
 }

@@ -21,4 +21,10 @@ public class ProductCreateRequest {
     private int productStock;
 
     private int totalPrice;
+
+    public ProductCreateRequest(String productName, int productPrice, int productStock) {
+        this.productName = productName;
+        this.productPrice = productPrice;
+        this.productStock = productStock;
+    }
 }
