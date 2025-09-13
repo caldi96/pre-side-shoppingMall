@@ -1,6 +1,7 @@
 package com.group.pre_side_shoppingMall.dto.order.orderItem.request;
 
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,6 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class OrderItemRequest {
 
+    @NotNull(message = "상품 ID는 필수입니다")
     @Min(value = 1, message = "상품 ID는 1 이상이어야 합니다")
     private Long productId;
 

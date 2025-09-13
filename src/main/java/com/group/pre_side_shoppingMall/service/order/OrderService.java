@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,7 +42,7 @@ public class OrderService {
         // 요청에서 넘어온 상품 ID
         Set<Long> productIds = request.getOrderItems().stream()
                 .map(OrderItemRequest::getProductId)
-                .collect(Collectors.toSet());
+                .collect(Collectors.toCollection(LinkedHashSet::new));
 
         // DB 조회 -> 요청에서 받아온 상품 ID들로 DB에서 상품들을 가져옴
         List<Product> products = productRepository.findAllById(productIds);

@@ -31,6 +31,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/signUp", "/api/auth/login").permitAll() // 회원가입, 로그인 허용
                         .requestMatchers("/product/**").permitAll() // 나중에 지워야함
+                        .requestMatchers("/order/**").permitAll() // 나중에 지워야함
                         .anyRequest().authenticated() // 나머지는 인증 필요
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
