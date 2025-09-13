@@ -172,4 +172,36 @@ public class OrderService {
 
         return new OrderResponse(savedOrder);
     }
+
+    @Transactional
+    public List<OrderResponse> getOrders(Long userId) {
+
+        // 1. 유저 확인
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다"));
+
+        List<Order> orders = orderRepository.findByUser(user);
+
+        List<OrderResponse> responses = orders.stream()
+                .map(OrderResponse::new)
+                .collect(Collectors.toList());
+
+        return responses;
+    }
+
+    @Transactional
+    public OrderResponse getOrder(Long userId, Long orderId) {
+
+        // 1. 유저 확인
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 유저가 존재하지 않습니다"));
+
+        // 2. 해당 주문이 존재하는지 확인
+        Order order = orderRepository.findByUserAndOrderId(user ,orderId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 주문 건이 존재하지 않습니다"));
+
+        OrderResponse response = new OrderResponse(order);
+
+        return response;
+    }
 }
