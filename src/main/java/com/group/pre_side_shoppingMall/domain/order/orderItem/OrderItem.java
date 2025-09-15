@@ -1,6 +1,6 @@
 package com.group.pre_side_shoppingMall.domain.order.orderItem;
 
-import com.group.pre_side_shoppingMall.domain.delivery.Delivery;
+import com.group.pre_side_shoppingMall.domain.order.orderItem.delivery.Delivery;
 import com.group.pre_side_shoppingMall.domain.order.Order;
 import com.group.pre_side_shoppingMall.domain.product.Product;
 import jakarta.persistence.*;
@@ -47,5 +47,13 @@ public class OrderItem {
 
     public int getOrderPrice() {
         return orderPrice;
+    }
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public Order getOrder() {
+        return order;
     }
 }

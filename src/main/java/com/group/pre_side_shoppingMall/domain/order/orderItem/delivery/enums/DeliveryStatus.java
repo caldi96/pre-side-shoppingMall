@@ -1,4 +1,4 @@
-package com.group.pre_side_shoppingMall.domain.delivery.enums;
+package com.group.pre_side_shoppingMall.domain.order.orderItem.delivery.enums;
 
 public enum DeliveryStatus {
     READY("배송 준비 중"),

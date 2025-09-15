@@ -1,7 +1,10 @@
 package com.group.pre_side_shoppingMall.common;
 
+import org.springframework.stereotype.Component;
+
 import java.util.Random;
 
+@Component
 public class TrackingNumberGenerator {
 
     private static final Random random = new Random();
