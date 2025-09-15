@@ -1,4 +1,4 @@
-package com.group.pre_side_shoppingMall.domain.delivery.enums;
+package com.group.pre_side_shoppingMall.domain.order.orderItem.delivery.enums;
 
 public enum ParcelCorp {
     CJ("CJ 대한통운"),
