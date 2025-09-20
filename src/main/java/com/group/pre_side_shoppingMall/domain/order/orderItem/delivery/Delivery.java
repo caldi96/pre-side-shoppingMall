@@ -38,6 +38,10 @@ public class Delivery {
         this.deliveryStatus = DeliveryStatus.READY;
     }
 
+    public void updateDeliveryStatus(DeliveryStatus deliveryStatus) {
+        this.deliveryStatus = deliveryStatus;
+    }
+
     public Long getDeliveryId() {
         return deliveryId;
     }
