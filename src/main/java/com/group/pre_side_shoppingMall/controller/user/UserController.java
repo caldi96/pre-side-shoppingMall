@@ -3,6 +3,8 @@ package com.group.pre_side_shoppingMall.controller.user;
 import com.group.pre_side_shoppingMall.dto.user.request.UserLoginRequest;
 import com.group.pre_side_shoppingMall.dto.user.request.UserSignUpRequest;
 import com.group.pre_side_shoppingMall.service.user.UserService;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,8 +28,21 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UserLoginRequest request) {
+    public ResponseEntity<?> login(@RequestBody UserLoginRequest request, HttpServletResponse response) {
+        // 로그인 검증 후 JWT 생성
         String token = userService.login(request);
-        return ResponseEntity.ok().body(Map.of("token", token));
+
+        // 쿠키 생성
+        Cookie cookie = new Cookie("jwt", token);
+        cookie.setHttpOnly(true);   // JS에서 접근 불가(보안)
+        cookie.setSecure(true);     // HTTPS 에서만 전송
+        cookie.setPath("/");
+        cookie.setMaxAge(60 * 60);  // 1시간
+
+        response.addCookie(cookie);
+
+        return ResponseEntity.ok("로그인 성공"); // 토큰은 쿠키로 내려감
+
+//        return ResponseEntity.ok().body(Map.of("token", token));
     }
 }

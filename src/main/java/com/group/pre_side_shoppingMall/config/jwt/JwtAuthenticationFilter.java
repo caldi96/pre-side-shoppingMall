@@ -2,6 +2,7 @@ package com.group.pre_side_shoppingMall.config.jwt;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -46,9 +47,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
  */
 
     private String resolveToken(HttpServletRequest request) {
+        // 1. 우선 Authorization 헤더 확인
         String bearer = request.getHeader(AUTH_HEADER);
         if (bearer != null && bearer.startsWith(BEARER_PREFIX)) {
             return bearer.substring(BEARER_PREFIX.length());
+        }
+
+        // 2. Authorization 헤더가 없으면 쿠키 확인
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("jwt".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
         }
         return null;
     }
